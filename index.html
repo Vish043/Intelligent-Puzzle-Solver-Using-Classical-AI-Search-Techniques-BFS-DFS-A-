@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Puzzle Solver - 8-Puzzle</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧩 Intelligent Puzzle Solver</h1>
+            <p class="subtitle">Using Classical AI Search Techniques (BFS, DFS, A*)</p>
+        </header>
+
+        <!-- Warning Message -->
+        <div class="warning-box">
+            <strong>⚠️ Important:</strong> This system supports <strong>2×2 and 3×3</strong> puzzles. 
+            Larger puzzles like 15-Puzzle are computationally infeasible for classical search algorithms.
+        </div>
+
+        <!-- Connection Status -->
+        <div id="connection-status" class="connection-status">
+            <span id="status-indicator" class="status-indicator"></span>
+            <span id="status-text">Checking connection...</span>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Panel: Puzzle Grid -->
+            <div class="puzzle-section">
+                <h2 id="puzzle-title">Puzzle Grid</h2>
+                <div class="size-selector">
+                    <label for="puzzle-size">Puzzle Size:</label>
+                    <select id="puzzle-size" class="select-box">
+                        <option value="2">2×2 (3-Puzzle)</option>
+                        <option value="3" selected>3×3 (8-Puzzle)</option>
+                    </select>
+                </div>
+                <div id="puzzle-grid" class="puzzle-grid"></div>
+                <div class="puzzle-controls">
+                    <button id="shuffle-btn" class="btn btn-secondary">Shuffle Puzzle</button>
+                    <button id="reset-btn" class="btn btn-secondary">Reset to Goal</button>
+                    <button id="custom-btn" class="btn btn-secondary">Set Custom Puzzle</button>
+                </div>
+                <div class="puzzle-hint">
+                    <p>💡 <strong>Tip:</strong> Click on tiles adjacent to the empty space to move them manually</p>
+                </div>
+                
+                <!-- Custom Puzzle Input Modal -->
+                <div id="custom-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-modal">&times;</span>
+                        <h2>Set Custom Puzzle</h2>
+                        <p>Enter puzzle values row by row (use 0 for empty tile):</p>
+                        <div id="custom-input-grid" class="custom-input-grid"></div>
+                        <div class="modal-buttons">
+                            <button id="apply-custom-btn" class="btn btn-primary">Apply</button>
+                            <button id="cancel-custom-btn" class="btn btn-secondary">Cancel</button>
+                        </div>
+                        <div id="custom-error" class="error-message"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Controls and Metrics -->
+            <div class="control-section">
+                <div class="algorithm-selector">
+                    <h2>Select Algorithm</h2>
+                    <select id="algorithm-select" class="select-box">
+                        <option value="BFS">Breadth First Search (BFS)</option>
+                        <option value="DFS">Depth-Limited DFS</option>
+                        <option value="A*">A* Search (Manhattan Distance)</option>
+                    </select>
+                    <div class="algorithm-info" id="algorithm-info">
+                        <p><strong>BFS:</strong> Explores level by level, guarantees optimal solution.</p>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="solve-btn" class="btn btn-primary">Solve Puzzle</button>
+                    <button id="step-btn" class="btn btn-secondary" disabled>Next Step</button>
+                    <button id="auto-btn" class="btn btn-secondary" disabled>Auto Play</button>
+                </div>
+
+                <div class="metrics-section">
+                    <h2>Performance Metrics</h2>
+                    <div id="metrics" class="metrics-box">
+                        <p class="placeholder">Click "Solve Puzzle" to see metrics</p>
+                    </div>
+                </div>
+
+                <div class="solution-info">
+                    <h2>Solution Path</h2>
+                    <div id="solution-steps" class="solution-box">
+                        <p class="placeholder">Solution will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Algorithm Explanation -->
+        <div class="info-section">
+            <h2>Algorithm Details</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>BFS (Breadth First Search)</h3>
+                    <ul>
+                        <li>Explores all states at depth d before depth d+1</li>
+                        <li>Guarantees optimal (shortest) solution</li>
+                        <li>Time: O(b^d), Space: O(b^d)</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>DFS (Depth First Search)</h3>
+                    <ul>
+                        <li>Explores deeply before backtracking</li>
+                        <li>Depth-limited to prevent infinite loops</li>
+                        <li>May not find optimal solution</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>A* (A-Star Search)</h3>
+                    <ul>
+                        <li>Uses f(n) = g(n) + h(n)</li>
+                        <li>Manhattan Distance heuristic</li>
+                        <li>Optimal and more efficient than BFS</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
