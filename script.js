@@ -9,12 +9,16 @@ class PuzzleSolverUI {
         this.autoPlayInterval = null;
         
         // Auto-detect API URL based on current page location
-        // If served from Flask, use same origin; otherwise default to localhost:5000
-        const baseUrl = window.location.origin.includes('5000') 
+        // If served from Flask/Render, use same origin; otherwise default to localhost:5000
+        const isLocal = window.location.origin.includes('localhost') || 
+                       window.location.origin.includes('127.0.0.1') ||
+                       window.location.origin.includes('192.168');
+        
+        const baseUrl = isLocal && window.location.origin.includes('5000')
             ? window.location.origin 
-            : (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+            : (isLocal
                 ? 'http://localhost:5000'
-                : window.location.origin.replace(/:\d+$/, ':5000')); // Replace port with 5000
+                : window.location.origin); // Use same origin for production (Render)
         this.apiUrl = `${baseUrl}/solve`;
         this.healthUrl = `${baseUrl}/health`;
         

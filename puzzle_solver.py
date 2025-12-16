@@ -517,64 +517,71 @@ FUTURE SCOPE:
 
 
 # Flask server for web interface
+try:
+    from flask import Flask, request, jsonify, send_from_directory
+    from flask_cors import CORS
+    import os
+    
+    app = Flask(__name__, static_folder='.')
+    CORS(app)
+    
+    @app.route('/')
+    def index():
+        """Serve the main HTML page."""
+        return send_from_directory('.', 'index.html')
+    
+    @app.route('/<path:filename>')
+    def static_files(filename):
+        """Serve static files (CSS, JS)."""
+        if filename in ['style.css', 'script.js']:
+            return send_from_directory('.', filename)
+        return "File not found", 404
+    
+    @app.route('/solve', methods=['POST'])
+    def solve():
+        """API endpoint for solving puzzle."""
+        try:
+            data = request.json
+            initial_board = data.get('board')
+            algorithm = data.get('algorithm', 'BFS')
+            
+            # Ensure all values are integers
+            if initial_board:
+                initial_board = [[int(cell) for cell in row] for row in initial_board]
+            
+            result = solve_puzzle(initial_board, algorithm)
+            return jsonify(result)
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": f"Error processing request: {str(e)}"
+            }), 400
+    
+    @app.route('/health', methods=['GET'])
+    def health():
+        """Health check endpoint."""
+        return jsonify({"status": "healthy", "supported_sizes": ["2×2", "3×3"]})
+    
+except ImportError:
+    app = None
+
 if __name__ == "__main__":
-    try:
-        from flask import Flask, request, jsonify, send_from_directory
-        from flask_cors import CORS
-        import os
-        
-        app = Flask(__name__, static_folder='.')
-        CORS(app)
-        
-        @app.route('/')
-        def index():
-            """Serve the main HTML page."""
-            return send_from_directory('.', 'index.html')
-        
-        @app.route('/<path:filename>')
-        def static_files(filename):
-            """Serve static files (CSS, JS)."""
-            if filename in ['style.css', 'script.js']:
-                return send_from_directory('.', filename)
-            return "File not found", 404
-        
-        @app.route('/solve', methods=['POST'])
-        def solve():
-            """API endpoint for solving puzzle."""
-            try:
-                data = request.json
-                initial_board = data.get('board')
-                algorithm = data.get('algorithm', 'BFS')
-                
-                # Ensure all values are integers
-                if initial_board:
-                    initial_board = [[int(cell) for cell in row] for row in initial_board]
-                
-                result = solve_puzzle(initial_board, algorithm)
-                return jsonify(result)
-            except Exception as e:
-                return jsonify({
-                    "success": False,
-                    "error": f"Error processing request: {str(e)}"
-                }), 400
-        
-        @app.route('/health', methods=['GET'])
-        def health():
-            """Health check endpoint."""
-            return jsonify({"status": "healthy", "supported_sizes": ["2×2", "3×3"]})
+    if app:
+        # Get port from environment variable (Render provides this) or default to 5000
+        port = int(os.environ.get('PORT', 5000))
+        debug = os.environ.get('FLASK_ENV') == 'development'
         
         print("=" * 60)
         print("Starting Puzzle Solver Server...")
         print("=" * 60)
-        print("🌐 Web Interface: http://localhost:5000")
-        print("📡 API Endpoint: http://localhost:5000/solve")
-        print("❤️  Health Check: http://localhost:5000/health")
+        print(f"🌐 Web Interface: http://localhost:{port}")
+        print(f"📡 API Endpoint: http://localhost:{port}/solve")
+        print(f"❤️  Health Check: http://localhost:{port}/health")
         print("✅ This system supports 2×2 and 3×3 puzzles")
         print("⚠️  15-Puzzle and larger are not supported")
         print("=" * 60)
-        app.run(debug=True, port=5000)
-        
-    except ImportError:
+        app.run(debug=debug, host='0.0.0.0', port=port)
+    else:
         # If Flask is not available, run as standalone
         print("Flask not installed. Running in standalone mode.")
         print("To use web interface, install: pip install flask flask-cors")
@@ -583,5 +590,6 @@ if __name__ == "__main__":
         example_board = [[1, 2, 3], [4, 0, 6], [7, 5, 8]]
         print("\nExample: Solving puzzle with BFS")
         result = solve_puzzle(example_board, "BFS")
+        import json
         print(json.dumps(result, indent=2))
 
